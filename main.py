@@ -9,6 +9,8 @@ from db import *
 load_dotenv()
 TOKEN = environ['TELEGRAM_TOKEN']
 CRED_PATH = environ['GOOGLE_CRED']
+MODE = environ.get('MODE', 'dev')
+PORT = int(environ.get("PORT", "8443"))
 
 db = Db(CRED_PATH)
 
@@ -45,7 +47,18 @@ def rand_quote(bot, update):
 
 def unknown(bot, update):
     update.message.reply_text('Sorry, I didn\'t understand that command.', reply_to_message_id=update.message.message_id)
-    
+
+def run(updater):
+    if MODE == 'prod':
+        HEROKU_APP_NAME = environ['HEROKU_APP_NAME']
+        updater.start_webhook(listen="0.0.0.0",
+                              port=PORT,
+                              url_path=TOKEN)
+        print("Running server on prod")
+    elif MODE == 'dev':
+        updater.start_polling()
+        print("Running server on development")
+
 def main():
     # Create the EventHandler and pass it your bot's token.
     updater = Updater(token=TOKEN)
@@ -62,8 +75,7 @@ def main():
     dp.add_error_handler(error)
 
     # Start the Bot
-    updater.start_polling()
-    print("Running server")
+    run(updater)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
