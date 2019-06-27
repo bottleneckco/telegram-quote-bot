@@ -1,5 +1,6 @@
 from os import environ
 import logging
+import json
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from dotenv import load_dotenv
@@ -8,11 +9,11 @@ from db import *
 
 load_dotenv()
 TOKEN = environ['TELEGRAM_TOKEN']
-CRED_PATH = environ['GOOGLE_CRED']
+CREDS = environ['GOOGLE_APPLICATION_CREDENTIALS']
 MODE = environ.get('MODE', 'dev')
 PORT = int(environ.get("PORT", "8443"))
 
-db = Db(CRED_PATH)
+db = Db(json.loads(CREDS))
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
