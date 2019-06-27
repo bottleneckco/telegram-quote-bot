@@ -42,9 +42,9 @@ def rand_quote(bot, update):
     if not selected:
         update.message.reply_text('No quotes found')
         logger.info(f'Retrived no msg for chat {update.message.chat_id}')
-
-    update.message.reply_text(f'"{selected["msg"]}"  by {selected["user"]}')
-    logger.info(f'Retrieved random msg "{selected["msg"]}" from {selected["user"]} to chat {update.message.chat_id}')
+    else:
+        update.message.reply_text(f'"{selected["msg"]}"  by {selected["user"]}')
+        logger.info(f'Retrieved random msg "{selected["msg"]}" from {selected["user"]} to chat {update.message.chat_id}')
 
 def unknown(bot, update):
     update.message.reply_text('Sorry, I didn\'t understand that command.', reply_to_message_id=update.message.message_id)
@@ -70,8 +70,8 @@ def main():
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler('start', start))
-    dp.add_handler(CommandHandler('save', save_quote))
-    dp.add_handler(CommandHandler('quote', rand_quote))
+    dp.add_handler(CommandHandler('quote', save_quote))
+    dp.add_handler(CommandHandler('random', rand_quote))
     dp.add_handler(MessageHandler(Filters.command, unknown))
     
     dp.add_error_handler(error)
