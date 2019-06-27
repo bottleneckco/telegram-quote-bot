@@ -1,7 +1,8 @@
+from os import environ
 import logging
+
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from dotenv import load_dotenv
-from os import environ
 
 from db import *
 
@@ -14,7 +15,7 @@ db = Db(CRED_PATH)
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('quote_bot')
 
 def start(bot, update):
     update.message.reply_text('Hi!')
@@ -26,8 +27,10 @@ def error(bot, update, error):
 def save_quote(bot, update):
     message_to_quote = update.message.reply_to_message
     if message_to_quote:
-        db.save_quote(message_to_quote.chat.id, message_to_quote.text, message_to_quote.from_user.username)
+        chat_id, text, username = message_to_quote.chat.id, message_to_quote.text, message_to_quote.from_user.username
+        db.save_quote(chat_id, text, username)
         update.message.reply_text('Message saved to quotes', reply_to_message_id=message_to_quote.message_id)
+        logger.info(f'Saved "{text}" from {username} to chat {chat_id}')
     else:
         update.message.reply_text('Reply this command to the message you would like to quote')
 
@@ -35,13 +38,14 @@ def rand_quote(bot, update):
     selected = db.rand_quote(update.message.chat_id)
     if not selected:
         update.message.reply_text('No quotes found')
+        logger.info(f'Retrived no msg for chat {update.message.chat_id}')
 
-    update.message.reply_text(f'\"{selected["msg"]}\"  by {selected["user"]}')
+    update.message.reply_text(f'"{selected["msg"]}"  by {selected["user"]}')
+    logger.info(f'Retrieved random msg "{selected["msg"]}" from {selected["user"]} to chat {update.message.chat_id}')
 
 def unknown(bot, update):
     update.message.reply_text('Sorry, I didn\'t understand that command.', reply_to_message_id=update.message.message_id)
     
-
 def main():
     # Create the EventHandler and pass it your bot's token.
     updater = Updater(token=TOKEN)
