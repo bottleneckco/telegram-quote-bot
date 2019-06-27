@@ -56,6 +56,7 @@ def run(updater):
                               port=PORT,
                               url_path=TOKEN)
         print("Running server on prod")
+        updater.bot.set_webhook(f"https://{HEROKU_APP_NAME}.herokuapp.com/{TOKEN}")
     elif MODE == 'dev':
         updater.start_polling()
         print("Running server on development")
