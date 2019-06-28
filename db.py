@@ -1,8 +1,7 @@
 from random import shuffle
 
 import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
+from firebase_admin import credentials, firestore
 
 class Db:
     def __init__(self, cred_path):
@@ -25,4 +24,3 @@ class Db:
 
         shuffle(msgs)
         return msgs[0]
-
