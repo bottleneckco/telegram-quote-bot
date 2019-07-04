@@ -10,9 +10,13 @@ class Db:
         firebase_admin.initialize_app(cred)
         self.db = firestore.client()
 
-    def save_quote(self, chat_id, text, username):
+    def save_quote(self, chat_id, text, username, datetime):
         chat_ref = self.db.document(f'chats/{str(chat_id)}')
-        chat_ref.collection('msgs').add({ 'msg': text, 'user': username })
+        chat_ref.collection('msgs').add({
+            'msg': text,
+            'user': username,
+            'datetime': datetime
+        })
 
     def rand_quote(self, chat_id):
         # Returns a generator object
