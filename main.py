@@ -10,7 +10,7 @@ load_dotenv()
 TOKEN = environ['TELEGRAM_TOKEN']
 CREDS = environ['GOOGLE_APPLICATION_CREDENTIALS']
 MODE = environ.get('MODE', 'dev')
-PORT = int(environ.get("PORT", "8443"))
+PORT = int(environ.get('PORT', '8443'))
 
 db = Db(json.loads(CREDS))
 
@@ -30,8 +30,11 @@ def save_quote(bot, update):
 
     if message_to_quote:
         if message_to_quote.text:
-            chat_id, text, username = message_to_quote.chat.id, message_to_quote.text, message_to_quote.from_user.username
-            db.save_quote(chat_id, text, username)
+            chat_id = message_to_quote.chat.id
+            username = message_to_quote.from_user.username
+            text, datetime = message_to_quote.text, message_to_quote.date
+            
+            db.save_quote(chat_id, text, username, datetime)
             update.message.reply_text('Message saved to quotes', reply_to_message_id=message_to_quote.message_id)
             logger.info(f'Saved "{text}" from {username} to chat {chat_id}')
 
@@ -42,26 +45,27 @@ def save_quote(bot, update):
         update.message.reply_text('Reply this command to the message you would like to quote.')
 
 def rand_quote(bot, update):
-    selected = db.rand_quote(update.message.chat_id)
+    quote = db.rand_quote(update.message.chat_id)
 
-    if not selected:
+    if not quote:
         update.message.reply_text('No quotes yet. Trying saving some quotes!')
         logger.info(f'Retrieved no msg for chat {update.message.chat_id}')
 
     else:
-        update.message.reply_text(f'"{selected["msg"]}"  by {selected["user"]}')
-        logger.info(f'Retrieved random msg "{selected["msg"]}" from {selected["user"]} to chat {update.message.chat_id}')
+        date = quote["datetime"].strftime('%d/%m/%Y')
+        update.message.reply_text(f'"{quote["msg"]}" \u2014 @{quote["user"]} on {date}')
+        logger.info(f'Retrieved random msg "{quote["msg"]}" from {quote["user"]} to chat {update.message.chat_id}')
 
 def run(updater):
     if MODE == 'prod':
         HEROKU_APP_NAME = environ['HEROKU_APP_NAME']
-        updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-        updater.bot.set_webhook(f"https://{HEROKU_APP_NAME}.herokuapp.com/{TOKEN}")
-        logger.info("Running server on production")
+        updater.start_webhook(listen='0.0.0.0', port=PORT, url_path=TOKEN)
+        updater.bot.set_webhook(f'https://{HEROKU_APP_NAME}.herokuapp.com/{TOKEN}')
+        logger.info('Running server on production')
 
     elif MODE == 'dev':
         updater.start_polling()
-        logger.info("Running server on development")
+        logger.info('Running server on development')
 
 def main():
     # Create the EventHandler and pass it your bot's token.
