@@ -8,13 +8,8 @@ from telegram import Bot
 from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters
 from db import *
 
-MODE = environ.get('MODE', 'dev')
 TOKEN = environ['TELEGRAM_TOKEN']
 CREDS = environ['GOOGLE_APPLICATION_CREDENTIALS']
-URL = environ['PROD_URL']
-if MODE == 'dev':
-    # ngrok url
-    URL = 'https://26304725.ngrok.io'
 
 db = Db(json.loads(CREDS))
 

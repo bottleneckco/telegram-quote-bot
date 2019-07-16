@@ -1,0 +1,3 @@
+[submodule "quote-bot-web"]
+	path = quote-bot-web
+	url = https://github.com/bottleneckco/quote-bot-web

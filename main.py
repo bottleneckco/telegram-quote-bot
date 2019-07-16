@@ -24,7 +24,7 @@ bot, update_queue = setup()
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/hello')
 def hello_world():
     return 'Hello World!'
 
@@ -33,6 +33,11 @@ def webhook_post():
     update = Update.de_json(request.get_json(force=True), bot)
     update_queue.put(update)
     return 'ok'
+
+@app.route(f'/', methods=['GET'])
+def view_quotes():
+    return app.send_static_file('ui/build/index.html')
+    
 
 # Only set webhook after webhook endpoint is setup
 bot.set_webhook(f'{URL}/{TOKEN}')
