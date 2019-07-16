@@ -22,7 +22,7 @@ logger = logging.getLogger('quote_bot')
 
 bot, update_queue = setup()
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='quote-bot-web/build')
 
 @app.route('/hello')
 def hello_world():
@@ -34,10 +34,9 @@ def webhook_post():
     update_queue.put(update)
     return 'ok'
 
-@app.route(f'/', methods=['GET'])
+@app.route('/', methods=['GET'])
 def view_quotes():
-    return app.send_static_file('ui/build/index.html')
-    
+    return app.send_static_file('index.html')
 
 # Only set webhook after webhook endpoint is setup
 bot.set_webhook(f'{URL}/{TOKEN}')
