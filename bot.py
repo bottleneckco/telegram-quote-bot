@@ -8,15 +8,23 @@ from telegram import Bot
 from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters
 from db import *
 
+MODE = environ.get('MODE', 'dev')
 TOKEN = environ['TELEGRAM_TOKEN']
 CREDS = environ['GOOGLE_APPLICATION_CREDENTIALS']
+URL = environ['PROD_URL']
+if MODE == 'dev':
+    # ngrok url
+    URL = 'https://26304725.ngrok.io'
 
 db = Db(json.loads(CREDS))
 
 logger = logging.getLogger('quote_bot')
 
 def start(bot, update):
+    message = update.message
     update.message.reply_text('Hi, let\'s save some quotes!')
+    logger.info(f'Received start msg from {message.from_user.username} in chat {message.chat.id}')
+
 
 # Only for telegram errors
 def error(bot, update, error):
@@ -84,5 +92,6 @@ def setup():
     
     # you might want to return dispatcher as well, 
     # to stop it at server shutdown, or to register more handlers:
-    # return (update_queue, dispatcher) 
-    return (update_queue, dp)
+    # return (update_queue, dispatcher)
+
+    return (bot, update_queue)
