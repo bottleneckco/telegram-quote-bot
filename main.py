@@ -56,6 +56,11 @@ def rand_quote(bot, update):
         update.message.reply_text(f'"{quote["msg"]}" \u2014 @{quote["user"]} on {date}')
         logger.info(f'Retrieved random msg "{quote["msg"]}" from {quote["user"]} to chat {update.message.chat_id}')
 
+def send_link(bot, update):
+    URL = 'https://quote-bot.netlify.com/'
+    update.message.reply_text(f'View and manage your quotes at: \n{URL}{update.message.chat_id}')
+    logger.info(f'Sent link for {update.message.chat_id}')
+
 def run(updater):
     if MODE == 'prod':
         HEROKU_APP_NAME = environ['HEROKU_APP_NAME']
@@ -78,6 +83,7 @@ def main():
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('quote', save_quote))
     dp.add_handler(CommandHandler('random', rand_quote))
+    dp.add_handler(CommandHandler('link', send_link))
     
     dp.add_error_handler(error)
 
